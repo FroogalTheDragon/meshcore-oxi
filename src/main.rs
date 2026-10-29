@@ -1,6 +1,11 @@
 mod ble;
+mod tui;
+mod app;
+mod contacts;
 
 use ble::{connect_mc_device, find_mc_devices, DeviceList, Device};
+use crossterm::style::Color::Blue;
+use tui::{BleConnectionScreen, Screens};
 
 use futures::StreamExt;
 use meshcore_rs::MeshCore;
@@ -18,6 +23,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     if let Some(d) = devices {
         println!("Attempting to connect to {:?}", d.devices.first().unwrap());
         let conn = connect_mc_device(d.devices.first().unwrap()).await?;
+        let screen = Screens::default();
+        dbg!(screen);
     } else {
         eprint!("Failed to find devices!");
     }
