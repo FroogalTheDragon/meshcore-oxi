@@ -18,7 +18,7 @@ impl Default for Device {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct DeviceList {
     pub devices: Vec<Device>,
     state: ListState,

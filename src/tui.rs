@@ -12,20 +12,20 @@ use ratatui::widgets::{
 };
 use ratatui::{DefaultTerminal, symbols};
 use crate::ble::DeviceList;
+use crate::contacts::ContactsList;
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Default)]
 pub struct BleConnectionScreen {
     available_devices: DeviceList
 }
 
-#[derive(Debug)]
+#[derive(Debug, Default, Clone)]
 pub struct ContactsScreen {
     contacts_list: ContactsList,
 }
 
 #[derive(Debug)]
 pub enum Screens {
-    #[default]
     BleConnectionScreen(BleConnectionScreen),
     ContactsScreen(ContactsScreen)
 }
