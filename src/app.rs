@@ -1,17 +1,29 @@
+use crate::{
+    ble::Device,
+    theme::THEME,
+    tui::{BleConnectionScreen, ContactsScreen, Screens},
+};
 use color_eyre::eyre::{Context, Result};
 use futures::io;
-use ratatui::{DefaultTerminal, Frame, buffer::Buffer, layout::{Constraint, Layout, Rect}, widgets::{Widget, Block}};
+use ratatui::{
+    DefaultTerminal, Frame,
+    buffer::Buffer,
+    layout::{Constraint, Layout, Rect},
+    style::Style,
+    text::Text,
+    widgets::{Block, Widget},
+};
+use ratatui_core::text::{Line, Span};
 use strum::{Display, EnumIter, FromRepr, IntoEnumIterator};
 
-use crate::{theme::THEME, tui::{BleConnectionScreen, ContactsScreen, Screens}};
-
-#[derive(Default)]
+// #[derive(Default)]
 pub struct App {
+    connected_device: Option<Device>,
     user_exited: bool,
     screen: Screens,
     ble_connection_screen: BleConnectionScreen,
     contacts_screen: ContactsScreen,
-    mode: Mode
+    mode: Mode,
 }
 
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
@@ -22,28 +34,46 @@ pub enum Mode {
     Quit,
 }
 
-#[derive(Debug, Clone, Copy, Default, Display, EnumIter, FromRepr, PartialEq, Eq)]
-enum Tab {
-    #[default]
-    Contacts,
-    BtleConnection
+// Default app state
+impl Default for App {
+    /// Define the default state of the app
+    fn default() -> Self {
+        Self {
+            connected_device: None,
+            user_exited: false,
+            screen: Screens::default(),
+            ble_connection_screen: BleConnectionScreen::default(),
+            contacts_screen: ContactsScreen::default(),
+            mode: Mode::default(),
+        }
+    }
 }
 
 /// Run/Event logic
 impl App {
-    pub fn new(user_exited: bool, screen: Screens, ble_connection_screen: BleConnectionScreen, contacts_screen: ContactsScreen, mode: Mode) -> Self {
+    pub fn new(
+        connected_device: Option<Device>,
+        user_exited: bool,
+        screen: Screens,
+        ble_connection_screen: BleConnectionScreen,
+        contacts_screen: ContactsScreen,
+        mode: Mode,
+    ) -> Self {
         Self {
+            connected_device,
             user_exited,
             screen,
             ble_connection_screen,
             contacts_screen,
-            mode
+            mode,
         }
     }
 
     pub fn run(&mut self, terminal: &mut DefaultTerminal) -> Result<()> {
-        while ! self.user_exited {
-            terminal.draw(|frame| self.render(frame)).wrap_err("terminal.draw")?;
+        while !self.user_exited {
+            terminal
+                .draw(|frame| self.render(frame))
+                .wrap_err("terminal.draw")?;
             self.handle_events()?;
         }
         Ok(())
@@ -87,19 +117,20 @@ impl Widget for &App {
 impl App {
     /// Render App Title bar
     fn render_title_bar(&self, area: Rect, buf: &mut Buffer) {
-
+        let line = Line::from("Hello, World!").style(Style::new().yellow());
+        line.render(area, buf);
     }
 
     /// Render the selected tab, the main content
     fn render_selected_tab(&self, area: Rect, buf: &mut Buffer) {
         match &self.screen {
             Screens::BleConnectionScreen(blect) => blect.clone().render(area, buf),
-            Screens::ContactsScreen(cts) => cts.clone().render(area, buf)
+            Screens::ContactsScreen(cts) => cts.clone().render(area, buf),
         }
     }
 
     /// Render bottom app bar
     fn render_bottom_bar(area: Rect, buf: &mut Buffer) {
-
+        Text::raw("Bottom UwU").render(area, buf);
     }
 }
