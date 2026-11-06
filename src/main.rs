@@ -1,23 +1,25 @@
-mod ble;
-mod tui;
 mod app;
+mod ble;
 mod contacts;
+mod db;
+mod error;
 mod theme;
+mod tui;
 
 
-use std::io::stdout;
-use ble::{connect_mc_device, find_mc_devices, DeviceList, Device};
-use crossterm::terminal::{EnterAlternateScreen, LeaveAlternateScreen};
+use ble::{Device, DeviceList};
 use color_eyre::Result;
-use crossterm::style::Color::Blue;
 use crossterm::execute;
+use crossterm::style::Color::Blue;
+use crossterm::terminal::{EnterAlternateScreen, LeaveAlternateScreen};
 use ratatui::{TerminalOptions, Viewport, layout::Rect};
+use std::io::stdout;
 use tui::{BleConnectionScreen, Screens};
 
+use crate::app::App;
 use futures::StreamExt;
 use meshcore_rs::MeshCore;
 use std::time::Duration;
-use crate::app::App;
 
 #[tokio::main]
 async fn main() -> Result<()> {
