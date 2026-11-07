@@ -1,7 +1,8 @@
 use crate::{
     ble::Device,
     theme::THEME,
-    tui::{BleConnectionScreen, ContactsScreen, Screens},
+    tui::Screens,
+    widgets::{bt_devices_screen::BleConnectionScreen, contacts_screen::ContactsScreen},
 };
 use color_eyre::eyre::{Context, Result};
 use futures::io;
@@ -11,7 +12,7 @@ use ratatui::{
     layout::{Constraint, Layout, Rect},
     style::Style,
     text::Text,
-    widgets::{Block, Widget},
+    widgets::{Block, Clear, Widget},
 };
 use ratatui_core::text::{Line, Span};
 use strum::{Display, EnumIter, FromRepr, IntoEnumIterator};
@@ -70,11 +71,15 @@ impl App {
     }
 
     pub fn run(&mut self, terminal: &mut DefaultTerminal) -> Result<()> {
-        while !self.user_exited {
-            terminal
-                .draw(|frame| self.render(frame))
-                .wrap_err("terminal.draw")?;
-            self.handle_events()?;
+        loop {
+            if self.user_exited {
+                break;
+            } else {
+                terminal
+                    .draw(|frame| self.render(frame))
+                    .wrap_err("terminal.draw")?;
+                self.handle_events()?;
+            };
         }
         Ok(())
     }
@@ -90,9 +95,6 @@ impl App {
 
     fn render(&self, frame: &mut Frame) {
         frame.render_widget(self, frame.area());
-        if self.mode == Mode::Destroy {
-            // destroy::destroy(frame);
-        }
     }
 }
 
@@ -117,7 +119,7 @@ impl Widget for &App {
 impl App {
     /// Render App Title bar
     fn render_title_bar(&self, area: Rect, buf: &mut Buffer) {
-        let line = Line::from("Hello, World!").style(Style::new().yellow());
+        let line = Line::from("Crabcore").style(Style::new().yellow());
         line.render(area, buf);
     }
 
@@ -131,6 +133,6 @@ impl App {
 
     /// Render bottom app bar
     fn render_bottom_bar(area: Rect, buf: &mut Buffer) {
-        Text::raw("Bottom UwU").render(area, buf);
+        Text::raw("Bottom Control Bar").render(area, buf);
     }
 }
