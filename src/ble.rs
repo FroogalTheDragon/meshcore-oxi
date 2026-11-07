@@ -22,16 +22,16 @@ impl Device {
     }
 
     /// Connect to a meshcore device
-    pub async fn connect_mc_device(device: &Device) -> Result<MeshCore, meshcore_rs::error::Error> {
+    pub async fn connect(&mut self, device: &Device) -> Result<MeshCore, meshcore_rs::error::Error> {
         let mc = MeshCore::ble_connect(&device.name).await?;
-        // let mut device = device.clone();
-        // device.is_connected = true;
+        self.is_connected = true;
         Ok(mc)
     }
 
     /// Deisconnect from meschcore device
-    pub async fn disconnect_mc_device(mc: MeshCore) -> Result<(), meshcore_rs::error::Error> {
+    pub async fn disconnect(&mut self, mc: MeshCore) -> Result<(), meshcore_rs::error::Error> {
         let _ = mc.disconnect().await?;
+        self.is_connected = false;
         Ok(())
     }
 
@@ -71,7 +71,7 @@ impl Default for Device {
 #[derive(Debug, Clone)]
 pub struct DeviceList {
     pub devices: Vec<Device>,
-    state: ListState,
+    pub state: ListState,
 }
 
 impl DeviceList {
