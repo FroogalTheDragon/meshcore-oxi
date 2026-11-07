@@ -1,3 +1,5 @@
+use crate::error::CrabCoreErrors;
+
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
 pub enum Path {
     Direct,
@@ -48,16 +50,16 @@ impl ContactsList {
         cl
     }
 
-    pub fn add_contact(&self, contact: Contact) -> Result<Self, ()> {
-        let mut cl = self.clone();
-        for c in self.contacts.clone() {
+    /// Add a contact to the list
+    pub fn add_contact(&mut self, contact: Contact) -> Result<Self, CrabCoreErrors> {
+        for c in self.contacts.iter_mut() {
             // Contact is already in the contact list
-            if c == contact {
-                return Err(());
+            if *c == contact {
+                return Err(CrabCoreErrors::FailedToAddContact(String::from("Failed to add contact: Contact already exists")));
             }
         }
-        cl.contacts.push(contact);
-        Ok(cl)
+        self.contacts.push(contact);
+        Ok(self.to_owned())
     }
 }
 
@@ -97,7 +99,7 @@ mod tests {
             contact_vec.push(contact);
         }
 
-        let test_contact_list = ContactsList::new(contact_vec.clone(), contact_vec.len() as u32);
+        let mut test_contact_list = ContactsList::new(contact_vec.clone(), contact_vec.len() as u32);
         assert_eq!(test_contact_list.contacts.len(), 4);
         let test_contact_list = test_contact_list.add_contact(Contact::default()).unwrap();
         assert_eq!(test_contact_list.contacts.len(), 5);
